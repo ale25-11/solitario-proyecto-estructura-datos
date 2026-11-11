@@ -13,6 +13,7 @@ class Tablero:
         for _ in range(7):
             self.columnas.append(DobleListaEnlazada())
         self.mazo_robo = ListaCircular()
+        self.nodo_robo = None
         self.repartir()
 
     def repartir(self):
@@ -35,6 +36,20 @@ class Tablero:
                 self.columnas[numero].insertar_final(carta)
         while not fila.esta_vacia():
             self.mazo_robo.insertar_final(fila.desencolar())
+    def robar(self):
+        """Avanza a la siguiente carta del mazo de robo y la deja boca arriba.
+        Al pasar la última carta, vuelve a la primera (lista circular).
+        Recibe: nada. Devuelve: la carta, o None si el mazo está vacío.
+        """
+        if self.mazo_robo.esta_vacia():
+            return None
+        if self.nodo_robo is None:
+            self.nodo_robo = self.mazo_robo.cabeza
+        else:
+            self.nodo_robo = self.nodo_robo.siguiente
+        carta = self.nodo_robo.dato
+        carta.boca_arriba = True
+        return carta        
 
     def mostrar(self):
         """Imprime el tablero en pantalla.
