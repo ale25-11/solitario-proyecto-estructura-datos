@@ -6,13 +6,17 @@ from juego.baraja import Baraja
 
 
 class Tablero:
-    """Tablero del solitario: 7 columnas y un mazo de robo."""
+    """Tablero del solitario: 7 columnas, mazo de robo y 4 fundaciones."""
 
     def __init__(self):
         """Crea el tablero y reparte las cartas."""
+        self.palos = ("corazones", "diamantes", "treboles", "picas")
         self.columnas = []
         for _ in range(7):
             self.columnas.append(DobleListaEnlazada())
+        self.fundaciones = []
+        for _ in range(4):
+            self.fundaciones.append(Pila())
         self.mazo_robo = ListaCircular()
         self.nodo_robo = None
         self.repartir()
@@ -97,6 +101,41 @@ class Tablero:
             lista_origen.ultimo.dato.boca_arriba = True
         return True, "Movimiento hecho"
 
+    def mover_a_fundacion(self, columna):
+        """Manda la última carta de una columna a su fundación, si las reglas lo permiten.
+        La fundación de cada palo empieza con el A y sube de uno en uno.
+        Recibe: columna (de 1 a 7).
+        Devuelve: una pareja (se_movio, mensaje). se_movio es True o False.
+        """
+        if columna < 1 or columna > 7:
+            return False, "Las columnas van del 1 al 7"
+        lista = self.columnas[columna - 1]
+        if lista.esta_vacia():
+            return False, "La columna está vacía"
+        carta = lista.ultimo.dato
+        if not carta.boca_arriba:
+            return False, "Esa carta está boca abajo"
+
+        fundacion = self.fundaciones[self.palos.index(carta.palo)]
+        if fundacion.esta_vacia():
+            if carta.valor != 1:
+                return False, "La fundación empieza con el A"
+        elif carta.valor != fundacion.ver_tope().valor + 1:
+            return False, "La carta debe valer uno más que la de la fundación"
+
+        lista.eliminar(carta)
+        fundacion.apilar(carta)
+        if not lista.esta_vacia():
+            lista.ultimo.dato.boca_arriba = True
+        return True, "Carta enviada a la fundación"
+
+    def ha_ganado(self):
+        """Recibe: nada. Devuelve: True si las 4 fundaciones llegaron a K (13 cartas)."""
+        for fundacion in self.fundaciones:
+            if fundacion.obtener_tamano() != 13:
+                return False
+        return True
+
     def mostrar(self):
         """Imprime el tablero en pantalla.
         Las cartas boca abajo se ven como [?].
@@ -114,3 +153,11 @@ class Tablero:
                 actual = actual.siguiente
             print(texto)
         print("Mazo de robo:", self.mazo_robo.obtener_tamano(), "cartas")
+        print("Fundaciones:")
+        for indice in range(4):
+            fundacion = self.fundaciones[indice]
+            if fundacion.esta_vacia():
+                tope = "vacía"
+            else:
+                tope = fundacion.ver_tope().como_texto()
+            print("  " + self.palos[indice] + ": " + tope)
