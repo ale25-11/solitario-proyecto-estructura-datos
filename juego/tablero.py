@@ -57,6 +57,54 @@ class Tablero:
         carta.boca_arriba = True
         return carta
 
+    def _quitar_carta_robo(self):
+        """Saca del mazo de robo la carta que está a la vista.
+        El marcador retrocede un puesto, así el próximo robo avanza a la carta que sigue.
+        Recibe: nada. Devuelve: la carta que se sacó.
+        """
+        carta = self.nodo_robo.dato
+        anterior = self.mazo_robo.ultimo
+        actual = self.mazo_robo.cabeza
+        for _ in range(self.mazo_robo.obtener_tamano()):
+            if actual is self.nodo_robo:
+                break
+            anterior = actual
+            actual = actual.siguiente
+        self.mazo_robo.eliminar(carta)
+        if self.mazo_robo.esta_vacia():
+            self.nodo_robo = None
+        else:
+            self.nodo_robo = anterior
+        return carta
+
+    def _cabe_en_columna(self, carta, lista_destino):
+        """Revisa si una carta puede ir al final de una columna.
+        Recibe: la carta y la columna (lista) de destino.
+        Devuelve: una pareja (se_puede, mensaje).
+        """
+        if lista_destino.esta_vacia():
+            if carta.valor != 13:
+                return False, "Una columna vacía solo acepta K"
+            return True, ""
+        carta_destino = lista_destino.ultimo.dato
+        if carta.valor != carta_destino.valor - 1:
+            return False, "La carta debe valer uno menos que la de destino"
+        if carta.color() == carta_destino.color():
+            return False, "La carta debe ser de color contrario"
+        return True, ""
+
+    def _cabe_en_fundacion(self, carta):
+        """Revisa si una carta puede ir a la fundación de su palo.
+        Recibe: la carta. Devuelve: una pareja (se_puede, mensaje).
+        """
+        fundacion = self.fundaciones[self.palos.index(carta.palo)]
+        if fundacion.esta_vacia():
+            if carta.valor != 1:
+                return False, "La fundación empieza con el A"
+        elif carta.valor != fundacion.ver_tope().valor + 1:
+            return False, "La carta debe valer uno más que la de la fundación"
+        return True, ""
+
     def mover_columna(self, origen, destino, cantidad):
         """Mueve un grupo de cartas de una columna a otra, si las reglas lo permiten.
         Recibe: origen y destino (columnas de 1 a 7) y cantidad de cartas
@@ -79,15 +127,9 @@ class Tablero:
         if not carta_base.boca_arriba:
             return False, "Esa carta está boca abajo"
 
-        if lista_destino.esta_vacia():
-            if carta_base.valor != 13:
-                return False, "Una columna vacía solo acepta K"
-        else:
-            carta_destino = lista_destino.ultimo.dato
-            if carta_base.valor != carta_destino.valor - 1:
-                return False, "La carta debe valer uno menos que la de destino"
-            if carta_base.color() == carta_destino.color():
-                return False, "La carta debe ser de color contrario"
+        se_puede, mensaje = self._cabe_en_columna(carta_base, lista_destino)
+        if not se_puede:
+            return False, mensaje
 
         auxiliar = Pila()
         for _ in range(cantidad):
@@ -116,17 +158,47 @@ class Tablero:
         if not carta.boca_arriba:
             return False, "Esa carta está boca abajo"
 
-        fundacion = self.fundaciones[self.palos.index(carta.palo)]
-        if fundacion.esta_vacia():
-            if carta.valor != 1:
-                return False, "La fundación empieza con el A"
-        elif carta.valor != fundacion.ver_tope().valor + 1:
-            return False, "La carta debe valer uno más que la de la fundación"
+        se_puede, mensaje = self._cabe_en_fundacion(carta)
+        if not se_puede:
+            return False, mensaje
 
         lista.eliminar(carta)
-        fundacion.apilar(carta)
+        self.fundaciones[self.palos.index(carta.palo)].apilar(carta)
         if not lista.esta_vacia():
             lista.ultimo.dato.boca_arriba = True
+        return True, "Carta enviada a la fundación"
+
+    def mover_robo_a_columna(self, destino):
+        """Baja la carta robada a una columna, si las reglas lo permiten.
+        Recibe: destino (columna de 1 a 7).
+        Devuelve: una pareja (se_movio, mensaje). se_movio es True o False.
+        """
+        if self.nodo_robo is None:
+            return False, "Primero roba una carta"
+        if destino < 1 or destino > 7:
+            return False, "Las columnas van del 1 al 7"
+        lista_destino = self.columnas[destino - 1]
+        carta = self.nodo_robo.dato
+        se_puede, mensaje = self._cabe_en_columna(carta, lista_destino)
+        if not se_puede:
+            return False, mensaje
+        self._quitar_carta_robo()
+        lista_destino.insertar_final(carta)
+        return True, "Carta movida a la columna"
+
+    def mover_robo_a_fundacion(self):
+        """Manda la carta robada a su fundación, si las reglas lo permiten.
+        Recibe: nada.
+        Devuelve: una pareja (se_movio, mensaje). se_movio es True o False.
+        """
+        if self.nodo_robo is None:
+            return False, "Primero roba una carta"
+        carta = self.nodo_robo.dato
+        se_puede, mensaje = self._cabe_en_fundacion(carta)
+        if not se_puede:
+            return False, mensaje
+        self._quitar_carta_robo()
+        self.fundaciones[self.palos.index(carta.palo)].apilar(carta)
         return True, "Carta enviada a la fundación"
 
     def ha_ganado(self):
@@ -153,6 +225,10 @@ class Tablero:
                 actual = actual.siguiente
             print(texto)
         print("Mazo de robo:", self.mazo_robo.obtener_tamano(), "cartas")
+        if self.nodo_robo is None:
+            print("Carta a la vista: ninguna")
+        else:
+            print("Carta a la vista:", self.nodo_robo.dato.como_texto())
         print("Fundaciones:")
         for indice in range(4):
             fundacion = self.fundaciones[indice]
