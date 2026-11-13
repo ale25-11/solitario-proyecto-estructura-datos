@@ -1,2 +1,1 @@
 # solitario-proyecto-estructura-datos
-

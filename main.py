@@ -46,6 +46,4 @@ def main():
             break
         else:
             print("Opción no válida, escribe 1, 2, 3, 4 o 5")
-
-
 main()
