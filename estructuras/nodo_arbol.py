@@ -5,6 +5,7 @@ class NodoArbol:
         """Crea un nodo de árbol.
         Recibe: dato, lo que se quiere guardar.
         Devuelve: nada (construye el objeto).
+        Complejidad: O(1).
         """
         self.dato = dato
         self.izquierda = None

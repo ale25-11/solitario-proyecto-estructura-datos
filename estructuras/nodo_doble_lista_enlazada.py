@@ -5,6 +5,7 @@ class NodoDobleListaEnlazada:
         """Crea un nodo.
         Recibe: dato, lo que se quiere guardar.
         Devuelve: nada (construye el objeto).
+        Complejidad: O(1).
         """
         self.dato = dato
         self.siguiente = None

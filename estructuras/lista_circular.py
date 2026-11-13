@@ -5,22 +5,29 @@ class ListaCircular:
     """Lista circular: el último nodo apunta de vuelta al primero."""
 
     def __init__(self):
-        """Crea una lista circular vacía."""
+        """Crea una lista circular vacía.
+        Complejidad: O(1).
+        """
         self.cabeza = None
         self.ultimo = None
         self.tamano = 0
 
     def esta_vacia(self):
-        """Recibe: nada. Devuelve: True si no hay datos, False si hay."""
+        """Recibe: nada. Devuelve: True si no hay datos, False si hay.
+        Complejidad: O(1).
+        """
         return self.cabeza is None
 
     def obtener_tamano(self):
-        """Recibe: nada. Devuelve: cuántos datos hay en la lista."""
+        """Recibe: nada. Devuelve: cuántos datos hay en la lista.
+        Complejidad: O(1), el tamaño se lleva en un contador.
+        """
         return self.tamano
 
     def insertar_inicio(self, dato):
         """Agrega un dato al principio de la lista.
         Recibe: dato. Devuelve: nada.
+        Complejidad: O(1), se usan las flechas a la cabeza y al último.
         """
         nuevo = Nodo(dato)
         if self.esta_vacia():
@@ -36,6 +43,7 @@ class ListaCircular:
     def insertar_final(self, dato):
         """Agrega un dato al final de la lista.
         Recibe: dato. Devuelve: nada.
+        Complejidad: O(1), se usa la flecha al último sin recorrer la lista.
         """
         nuevo = Nodo(dato)
         if self.esta_vacia():
@@ -52,6 +60,8 @@ class ListaCircular:
         """Agrega un dato en una posición (0 es el inicio).
         Recibe: dato y posicion.
         Devuelve: True si se pudo insertar, False si la posición no existe.
+        Complejidad: O(n), hay que recorrer hasta llegar a la posición
+        (O(1) si es el inicio o el final).
         """
         if posicion < 0 or posicion > self.tamano:
             return False
@@ -73,6 +83,7 @@ class ListaCircular:
     def eliminar(self, dato):
         """Elimina la primera vez que aparece un dato.
         Recibe: dato. Devuelve: True si lo eliminó, False si no lo encontró.
+        Complejidad: O(n), en el peor caso recorre una vuelta completa.
         """
         if self.esta_vacia():
             return False
@@ -98,6 +109,7 @@ class ListaCircular:
     def buscar(self, dato):
         """Busca un dato en la lista.
         Recibe: dato. Devuelve: su posición (0 es el inicio), o -1 si no está.
+        Complejidad: O(n), en el peor caso revisa todos los nodos.
         """
         actual = self.cabeza
         for posicion in range(self.tamano):
@@ -109,6 +121,7 @@ class ListaCircular:
     def recorrer(self):
         """Muestra todos los datos una sola vuelta.
         Recibe: nada. Devuelve: nada (imprime en pantalla).
+        Complejidad: O(n), pasa una vez por cada nodo.
         """
         if self.esta_vacia():
             print("Lista vacía")

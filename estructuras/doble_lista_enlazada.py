@@ -5,22 +5,29 @@ class DobleListaEnlazada:
     """Doble lista enlazada: se puede recorrer hacia adelante y atrás."""
 
     def __init__(self):
-        """Crea una lista vacía."""
+        """Crea una lista vacía.
+        Complejidad: O(1).
+        """
         self.cabeza = None
         self.ultimo = None
         self.tamano = 0
 
     def esta_vacia(self):
-        """Recibe: nada. Devuelve: True si no hay datos, False si hay."""
+        """Recibe: nada. Devuelve: True si no hay datos, False si hay.
+        Complejidad: O(1).
+        """
         return self.cabeza is None
 
     def obtener_tamano(self):
-        """Recibe: nada. Devuelve: cuántos datos hay en la lista."""
+        """Recibe: nada. Devuelve: cuántos datos hay en la lista.
+        Complejidad: O(1), el tamaño se lleva en un contador.
+        """
         return self.tamano
 
     def insertar_inicio(self, dato):
         """Agrega un dato al principio de la lista.
         Recibe: dato. Devuelve: nada.
+        Complejidad: O(1), se usa la flecha a la cabeza.
         """
         nuevo = NodoDobleListaEnlazada(dato)
         if self.esta_vacia():
@@ -35,6 +42,7 @@ class DobleListaEnlazada:
     def insertar_final(self, dato):
         """Agrega un dato al final de la lista.
         Recibe: dato. Devuelve: nada.
+        Complejidad: O(1), se usa la flecha al último sin recorrer la lista.
         """
         nuevo = NodoDobleListaEnlazada(dato)
         if self.esta_vacia():
@@ -50,6 +58,8 @@ class DobleListaEnlazada:
         """Agrega un dato en una posición (0 es el inicio).
         Recibe: dato y posicion.
         Devuelve: True si se pudo insertar, False si la posición no existe.
+        Complejidad: O(n), hay que recorrer hasta llegar a la posición
+        (O(1) si es el inicio o el final).
         """
         if posicion < 0 or posicion > self.tamano:
             return False
@@ -74,6 +84,8 @@ class DobleListaEnlazada:
     def eliminar(self, dato):
         """Elimina la primera vez que aparece un dato.
         Recibe: dato. Devuelve: True si lo eliminó, False si no lo encontró.
+        Complejidad: O(n), buscar el dato puede recorrer toda la lista
+        (quitar el nodo, una vez encontrado, es O(1)).
         """
         actual = self.cabeza
         while actual is not None:
@@ -94,6 +106,7 @@ class DobleListaEnlazada:
     def buscar(self, dato):
         """Busca un dato en la lista.
         Recibe: dato. Devuelve: su posición (0 es el inicio), o -1 si no está.
+        Complejidad: O(n), en el peor caso revisa todos los nodos.
         """
         actual = self.cabeza
         posicion = 0
@@ -107,6 +120,7 @@ class DobleListaEnlazada:
     def recorrer_adelante(self):
         """Muestra los datos del primero al último.
         Recibe: nada. Devuelve: nada (imprime en pantalla).
+        Complejidad: O(n), pasa una vez por cada nodo.
         """
         if self.esta_vacia():
             print("Lista vacía")
@@ -123,6 +137,7 @@ class DobleListaEnlazada:
     def recorrer_atras(self):
         """Muestra los datos del último al primero.
         Recibe: nada. Devuelve: nada (imprime en pantalla).
+        Complejidad: O(n), pasa una vez por cada nodo.
         """
         if self.esta_vacia():
             print("Lista vacía")
