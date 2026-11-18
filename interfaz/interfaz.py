@@ -350,8 +350,12 @@ class VentanaJuego:
 
         crear_boton(barra, "Rendirse", self.rendirse, compacto=True).pack(
             side="right", padx=(5, 0))
-        crear_boton(barra, "Reglas", self.menu.reglas, compacto=True).pack(
-            side="right", padx=(5, 0))
+        crear_boton(
+            barra,
+            "Reglas",
+            lambda: self.menu.reglas(self.ventana),
+            compacto=True
+        ).pack(side="right", padx=(5, 0))
         self.boton_sonido = crear_boton(barra, "Sonido: sí", self.alternar_sonido,
                                         compacto=True)
         self.boton_sonido.pack(side="right", padx=(5, 0))
@@ -1581,15 +1585,18 @@ class MenuPrincipal:
         crear_boton(self.raiz, texto, comando, primario=primario, grande=True).pack(
             fill="x", padx=70, pady=6)
 
-    def abrir_dialogo(self, titulo, ancho, alto):
+    def abrir_dialogo(self, titulo, ancho, alto, padre=None):
         """Crea una ventana secundaria con el mismo estilo.
-        Recibe: el título y el tamaño. Devuelve: la ventana.
+        Recibe: título, tamaño y ventana padre opcional. Devuelve: la ventana.
         """
-        dialogo = tk.Toplevel(self.raiz)
+        if padre is None:
+            padre = self.raiz
+
+        dialogo = tk.Toplevel(padre)
         dialogo.title(titulo)
         dialogo.configure(bg=BARRA)
         dialogo.resizable(False, False)
-        dialogo.transient(self.raiz)
+        dialogo.transient(padre)
         centrar(dialogo, ancho, alto)
         dialogo.focus_set()
         return dialogo
@@ -1602,11 +1609,11 @@ class MenuPrincipal:
         """Abre la partida con el tablero casi ganado. Recibe: nada. Devuelve: nada."""
         VentanaJuego(self, True)
 
-    def reglas(self):
+    def reglas(self, padre=None):
         """Muestra las reglas y los consejos de manejo.
-        Recibe: nada. Devuelve: nada.
+        Recibe: una ventana padre opcional. Devuelve: nada.
         """
-        dialogo = self.abrir_dialogo("Reglas", 520, 560)
+        dialogo = self.abrir_dialogo("Reglas", 520, 560, padre)
         tk.Label(dialogo, text="Reglas", bg=BARRA, fg=TEXTO,
                  font=(FUENTE_TITULO, 24, "bold")).pack(pady=(22, 10))
         for linea in REGLAS:
